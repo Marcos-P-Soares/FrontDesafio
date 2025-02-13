@@ -36,7 +36,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userInput }),
+        body: JSON.stringify(userInput), // Enviando apenas a string
       });
 
       if (!response.ok) throw new Error("Falha na requisição");

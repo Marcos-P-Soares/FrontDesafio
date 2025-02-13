@@ -84,7 +84,7 @@ export default function RankingCard({ model, rankings }: RankingCardProps) {
                 className="flex items-center justify-between p-2 rounded bg-muted"
               >
                 <span>{rank}</span>
-                <span className="font-semibold">{score}</span>
+                <span className="font-semibold">{String(score)}</span>
               </div>
             ))}
           </div>

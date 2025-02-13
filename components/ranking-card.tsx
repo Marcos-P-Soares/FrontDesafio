@@ -24,7 +24,7 @@ export default function RankingCard({ model, rankings }: RankingCardProps) {
     try {
       // Extract JSON objects from the string
       const jsonStrings = rankingsStr.match(/\{[^}]+\}/g) || [];
-      const [scores, finalRankings] = jsonStrings.map(str => JSON.parse(str));
+      const [scores, finalRankings] = jsonStrings.map(str => JSON.parse(str)) as [Record<string, string>, Record<string, string>];
       
       return { scores, finalRankings };
     } catch (error) {
@@ -56,6 +56,7 @@ export default function RankingCard({ model, rankings }: RankingCardProps) {
           </TableHeader>
           <TableBody>
             {Object.entries(scores).map(([model, scoreStr]) => {
+              if (typeof scoreStr !== "string") return null;
               const scoreMatches = (scoreStr as string).match(/clareza: (\d+), Precisão da informação: (\d+), Criatividade: (\d+), Consistência gramatical: (\d+)/);
               if (!scoreMatches) return null;
               

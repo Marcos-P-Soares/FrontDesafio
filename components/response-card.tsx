@@ -9,7 +9,9 @@ interface ResponseCardProps {
 }
 
 export default function ResponseCard({ model, response }: ResponseCardProps) {
-  const modelName = model.split("/")[1].split(":")[0];
+  const modelName = typeof model === "string" && model.includes("/")
+      ? model.split("/")[1].split(":")[0]
+      : model || "Modelo Desconhecido";
 
   return (
     <Card className="transition-all hover:shadow-lg">

@@ -31,18 +31,22 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/openrouter/ask-and-rank`, {
+      const response = await fetch(`${API_URL}/api/query`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userInput), // Enviando apenas a string
+        body: JSON.stringify({ question: userInput }), // Mantendo a estrutura correta
       });
 
       if (!response.ok) throw new Error("Falha na requisição");
-      
+
       const data = await response.json();
-      setResponses(data);
+      setResponses({
+        responses: data.responses, 
+        rankings: data.evaluations.rankings, 
+        evaluations: data.evaluations.evaluations 
+      });
     } catch (error) {
       toast({
         title: "Erro",
@@ -98,7 +102,12 @@ export default function Home() {
 
             <TabsContent value="rankings" className="space-y-4">
               {Object.entries(responses.rankings).map(([model, rankings]) => (
-                <RankingCard key={model} model={model} rankings={rankings as string} />
+                <RankingCard 
+                  key={model} 
+                  model={model} 
+                  rankings={rankings as any[]} 
+                  evaluations={responses.evaluations[model] || {}} 
+                />
               ))}
             </TabsContent>
           </Tabs>

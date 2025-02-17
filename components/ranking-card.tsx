@@ -13,34 +13,17 @@ import { Trophy } from "lucide-react";
 
 interface RankingCardProps {
   model: string;
-  rankings: string;
+  rankings: { position: number; model: string; average: number }[];
+  evaluations: Record<string, { clarity: number; accuracy: number; creativity: number; grammar: number; average: number }>;
 }
 
-export default function RankingCard({ model, rankings }: RankingCardProps) {
-  const modelName = model.split("/")[1].split(":")[0];
-
-  // Parse the rankings string to extract scores
-  const parseRankings = (rankingsStr: string) => {
-    try {
-      // Extract JSON objects from the string
-      const jsonStrings = rankingsStr.match(/\{[^}]+\}/g) || [];
-      const [scores, finalRankings] = jsonStrings.map(str => JSON.parse(str)) as [Record<string, string>, Record<string, string>];
-      
-      return { scores, finalRankings };
-    } catch (error) {
-      console.error("Error parsing rankings:", error);
-      return { scores: {}, finalRankings: {} };
-    }
-  };
-
-  const { scores, finalRankings } = parseRankings(rankings);
-
+export default function RankingCard({ model, rankings, evaluations }: RankingCardProps) {
   return (
     <Card className="transition-all hover:shadow-lg">
       <CardHeader className="flex flex-row items-center gap-2">
         <Trophy className="w-5 h-5 text-primary" />
         <CardTitle className="text-sm font-medium">
-          Avaliação por {modelName}
+          Avaliação por {model}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -52,39 +35,33 @@ export default function RankingCard({ model, rankings }: RankingCardProps) {
               <TableHead>Precisão</TableHead>
               <TableHead>Criatividade</TableHead>
               <TableHead>Gramática</TableHead>
+              <TableHead>Média</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Object.entries(scores).map(([model, scoreStr]) => {
-              if (typeof scoreStr !== "string") return null;
-              const scoreMatches = (scoreStr as string).match(/clareza: (\d+), Precisão da informação: (\d+), Criatividade: (\d+), Consistência gramatical: (\d+)/);
-              if (!scoreMatches) return null;
-              
-              const [_, clarity, precision, creativity, grammar] = scoreMatches;
-              
-              return (
-                <TableRow key={model}>
-                  <TableCell className="font-medium">{model}</TableCell>
-                  <TableCell>{clarity}</TableCell>
-                  <TableCell>{precision}</TableCell>
-                  <TableCell>{creativity}</TableCell>
-                  <TableCell>{grammar}</TableCell>
-                </TableRow>
-              );
-            })}
+            {Object.entries(evaluations).map(([evaluatedModel, scores]) => (
+              <TableRow key={evaluatedModel}>
+                <TableCell className="font-medium">{evaluatedModel}</TableCell>
+                <TableCell>{scores.clarity.toFixed(1)}</TableCell>
+                <TableCell>{scores.accuracy.toFixed(1)}</TableCell>
+                <TableCell>{scores.creativity.toFixed(1)}</TableCell>
+                <TableCell>{scores.grammar.toFixed(1)}</TableCell>
+                <TableCell className="font-bold">{scores.average.toFixed(2)}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
 
         <div className="space-y-2">
           <h4 className="font-semibold">Ranking Final</h4>
           <div className="grid gap-2">
-            {Object.entries(finalRankings).map(([rank, score]) => (
+            {rankings.map(({ position, model, average }) => (
               <div
-                key={rank}
+                key={model}
                 className="flex items-center justify-between p-2 rounded bg-muted"
               >
-                <span>{rank}</span>
-                <span className="font-semibold">{String(score)}</span>
+                <span>{position}. {model}</span>
+                <span className="font-semibold">{average.toFixed(2)}</span>
               </div>
             ))}
           </div>
